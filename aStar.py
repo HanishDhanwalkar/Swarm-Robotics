@@ -50,12 +50,13 @@ class Map:
         self.init.fscore = self.init.getFscore(self.fin)
 
     def Dist(self, p1, p2):
-        delta = p1-p2
-        return np.sqrt(delta[0]**2+delta[1]**2)
+        deltaX = p1[0]-p2[0]
+        deltaY = p1[1]-p2[1]
+        return np.sqrt(deltaX**2+deltaY**2)
 
     def isCollision(self, p, point: Node):
         t = point.t+self.Dist(p, np.array([3, 3]))/3
-        if self.mapT[p[0]+point.x-3, p[1]+point.y-3] == -1 or abs(self.mapT[p[0]+point.x-3, p[1]+point.y-3]-t) < 1:
+        if self.mapT[p[0]+point.x-3, p[1]+point.y-3] == np.inf or abs(self.mapT[p[0]+point.x-3, p[1]+point.y-3]-t) < 0.5:
             return self.Dist(p, np.array([3, 3]))
         return np.inf
 
@@ -64,13 +65,12 @@ class Map:
         obstacles = np.argwhere((hood == 100))
         if len(obstacles) == 0:
             return 0
-        closest = sorted(
-            list(obstacles), key=lambda x: self.isCollision(x, point))[0]
-        return 5/self.Dist(closest, np.array([3, 3]))
+        closest = sorted(obstacles, key=lambda x: self.isCollision(x, point))[0]
+        return 25/self.Dist(closest, np.array([3, 3]))
 
     def updatedGScore(self, init: Node, new: Node):
         t = init.t+init.Dist(new)/3
-        if self.map[new.x, new.y] == 100 and (self.mapT[new.x, new.y] == -1 or abs(self.mapT[new.x, new.y]-t) < 1):
+        if self.map[new.x, new.y] == 100 and (self.mapT[new.x, new.y] == np.inf or abs(self.mapT[new.x, new.y]-t) < 0.5):
             return np.inf
         return init.gscore+self.neighbourOfObstacle(new)+1
 

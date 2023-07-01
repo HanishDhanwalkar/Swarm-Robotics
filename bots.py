@@ -9,6 +9,7 @@ class Box:
         self.y = y
         self.pos = [self.x, self.y]
         self.dest = None
+        self.reachtime=np.inf
 
     def Dist(self, point):
         delX = self.x-point[0]
@@ -53,6 +54,7 @@ class Bot:
         w, h = map.shape
         m = Map(w, h, map, self.pos, self.box.pos, mapT)
         path, t = m.getPath()
+        self.box.reachtime=t[0]
         return path[::-1], t[::-1]
 
     def path2target(self, map, mapT, tStart):

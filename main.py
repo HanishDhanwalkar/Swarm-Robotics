@@ -11,115 +11,78 @@ MAP[0, :] = 100
 MAP[24, :] = 100
 MAP[:, 0] = 100
 MAP[:, 24] = 100
-MAP_T[:, :] = -1
+MAP_T[:, :] = np.inf
 
+numBots=4
 obstacles = np.argwhere(MAP == 100)
 
-dest1 = [10, 16]
-box1 = Box(23, 3)
-bot1 = Bot(3, 3)
-box1.dest = dest1
-bot1.assignBox(box1)
+dests = [[12, 10], [12, 11], [12, 12], [13, 10]]
+bxs = np.random.randint(1, 24, (4, 2))
+bts = np.random.randint(1, 24, (4, 2))
 
-dest2 = [20, 23]
-box2 = Box(23, 6)
-bot2 = Bot(3, 5)
-box2.dest = dest2
-bot2.assignBox(box2)
+boxes = []
+bots = []
 
-dest3 = [10, 13]
-box3 = Box(20, 2)
-bot3 = Bot(3, 18)
-box3.dest = dest3
-bot3.assignBox(box3)
+for i in range(numBots):
+    boxes.append(Box(*bxs[i]))
+    bots.append(Bot(*bts[i]))
+    boxes[i].dest = dests[i]
+    bots[i].assignBox(boxes[i])
 
-p2, t2, tb2 = bot2.createPath(MAP, MAP_T)
+bots=sorted(bots,key= lambda x: x.Dist(x.box)+x.box.Dist(x.target))
 
-MAP[list(map(list, p2.T))] = 100
-MAP_T[list(map(list, p2.T))] = t2
+p, t, tb = [], [], []
 
-p1, t1, tb1 = bot1.createPath(MAP, MAP_T)
+for i in range(numBots):
+    p1, t1, tb1 = bots[i].createPath(MAP, MAP_T)
+    p.append(p1)
+    t.append(t1)
+    tb.append(tb1)
 
-MAP[list(map(list, p1.T))] = 100
-MAP_T[list(map(list, p1.T))] = t1
-
-p3, t3, tb3 = bot3.createPath(MAP, MAP_T)
-
-# figure = plt.figure(figsize=(6, 6))
-# ax = figure.add_subplot(111,projection='3d')
-# ax.set_xlim(-1, 25)
-# ax.set_ylim(-1, 25)
-# b1=ax.scatter([bot1.pos[0]], [bot1.pos[1]],[0], marker='o',
-#            color='g', label='Bot 1', zorder=3)
-# b2=ax.scatter([bot2.pos[0]], [bot2.pos[1]],[0], marker='o',
-#            color='r', label='Bot 2', zorder=3)
-# bx1=ax.scatter([box1.pos[0]], [box1.pos[1]], [tb1],marker='d',
-#            color='g', label='Box 1', zorder=3)
-# bx2=ax.scatter([box2.pos[0]], [box2.pos[1]], [tb2],marker='d',
-#            color='r', label='Box 2', zorder=3)
-# des1=ax.scatter([dest1[0]], [dest1[1]], [t1[-1]],marker='*',
-#            color='g', label='Dest 1', zorder=3)
-# des2=ax.scatter([dest2[0]], [dest2[1]], [t2[-1]],marker='*',
-#            color='r', label='Dest 2', zorder=3)
-# ax.scatter(obstacles[:, 0], obstacles[:, 1],[0],
-#            marker='.', color='k', zorder=2)
-# ax.plot(p1[:, 0], p1[:, 1],t1, color='g', label='Path 1', zorder=2)
-# ax.plot(p2[:, 0], p2[:, 1],t2, color='r', label='Path 2', zorder=2)
-# plt.xlabel('x')
-# plt.ylabel('y')
-# ax.set_zlabel('time')
-# plt.legend(loc='lower right')
-
+    MAP[list(map(list, p[i].T))] = 100
+    MAP_T[list(map(list, p[i].T))] = t[i]
+    MAP_T[p[i][-1][0], p[i][-1][1]] = np.inf
 
 figure2 = plt.figure(figsize=(6, 6))
-ax2 = figure2.add_subplot(111)
+ax2 = figure2.add_subplot(111,projection='3d')
 ax2.set_xlim(-1, 25)
 ax2.set_ylim(-1, 25)
-b1 = ax2.scatter([bot1.pos[0]], [bot1.pos[1]], marker='o',
-                 color='g', label='Bot 1', zorder=3)
-b2 = ax2.scatter([bot2.pos[0]], [bot2.pos[1]], marker='o',
-                 color='r', label='Bot 2', zorder=3)
-b3 = ax2.scatter([bot3.pos[0]], [bot3.pos[1]], marker='o',
-                 color='b', label='Bot 2', zorder=3)
-bx1 = ax2.scatter([box1.pos[0]], [box1.pos[1]], marker='d',
-                  color='g', label='Box 1', zorder=3)
-bx2 = ax2.scatter([box2.pos[0]], [box2.pos[1]], marker='d',
-                  color='r', label='Box 2', zorder=3)
-bx3 = ax2.scatter([box3.pos[0]], [box3.pos[1]], marker='d',
-                  color='b', label='Box 2', zorder=3)
-des1 = ax2.scatter([dest1[0]], [dest1[1]], marker='*',
-                   color='g', label='Dest 1', zorder=3)
-des2 = ax2.scatter([dest2[0]], [dest2[1]], marker='*',
-                   color='r', label='Dest 2', zorder=3)
-des3 = ax2.scatter([dest3[0]], [dest3[1]], marker='*',
-                   color='b', label='Dest 2', zorder=3)
-ax2.scatter(obstacles[:, 0], obstacles[:, 1],
+ax2.scatter(obstacles[:, 0], obstacles[:, 1], [0],
             marker='.', color='k', zorder=2)
-ax2.plot(p1[:, 0], p1[:, 1], color='g', label='Path 1', zorder=2)
-ax2.plot(p2[:, 0], p2[:, 1], color='r', label='Path 2', zorder=2)
-ax2.plot(p3[:, 0], p3[:, 1], color='b', label='Path 3', zorder=2)
+
+plotBots, plotBoxes, plotDests, plotPaths = [], [], [], []
+clrs = ['r', 'g', 'b', 'k']
+
+for i in range(numBots):
+    plotBots.append(ax2.scatter([bots[i].pos[0]], [bots[i].pos[1]],[0], marker='o',
+                    color=clrs[i], label=f'Bot {i+1}', zorder=3))
+    plotBoxes.append(ax2.scatter([bots[i].box.pos[0]], [bots[i].box.pos[1]],[bots[i].box.reachtime], marker='d',
+                                 color=clrs[i], label=f'Box {i+1}', zorder=3))
+    plotDests.append(ax2.scatter([bots[i].target[0]], [bots[i].target[1]],[t[i][-1]], marker='*',
+                                 color=clrs[i], label=f'Dest {i+1}', zorder=3))
+    plotPaths.append(ax2.plot(p[i][:, 0], p[i][:, 1],t[i],
+                     color=clrs[i], label='Path 1', zorder=2))
+
 plt.xlabel('x')
 plt.ylabel('y')
 
-# # plt.legend()
-# plt.show()
+maxtime = 0
+for i in range(numBots):
+    print(bots[i].t[-1])
+    if bots[i].t[-1] > maxtime:
+        maxtime = bots[i].t[-1]
+
+# sns.heatmap(MAP_T.T,vmin=0,vmax=maxtime)
+# plt.legend()
+plt.show()
 
 
 def animate(i):
-    l1 = min(i, 10*bot1.t[-1])
-    l2 = min(i, 10*bot2.t[-1])
-    l3 = min(i, 10*bot3.t[-1])
-
-    b1.set_offsets(bot1.returnPos(l1))
-    b2.set_offsets(bot2.returnPos(l2))
-    b3.set_offsets(bot3.returnPos(l3))
+    for j in range(numBots):
+        lim = min(i, 10*bots[j].t[-1])
+        plotBots[j].set_offsets(bots[j].returnPos(lim))
+        plotBoxes[j].set_offsets([boxes[j].pos[0], boxes[j].pos[1]])
 
 
-    bx1.set_offsets([box1.pos[0], box1.pos[1]])
-    bx2.set_offsets([box2.pos[0], box2.pos[1]])
-    bx3.set_offsets([box3.pos[0], box3.pos[1]])
-
-
-anim = FuncAnimation(figure2, animate, 10 *
-                     int(max(bot2.t[-1], bot1.t[-1], bot3.t[-1])+2), interval=2)
-anim.save('anim.mp4', FFMpegWriter())
+# anim = FuncAnimation(figure2, animate, 10 * int(maxtime+2), interval=2)
+# anim.save('anim.mp4', FFMpegWriter())
