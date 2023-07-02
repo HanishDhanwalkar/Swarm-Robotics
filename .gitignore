@@ -1,2 +1,5 @@
 /__pycache__/*
-/aruco.webm
+/__pycache__
+/images
+/images/*
+/.gitignore

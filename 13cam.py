@@ -2,24 +2,24 @@ import cv2 as cv
 import cv2.aruco as aruco
 import numpy as np
 
+def transformation(matrix,coordinate):
+    x=np.ones((3,1))
+    x[0]=coordinate[0]
+    x[1]=coordinate[1]
+    x_=np.matmul(matrix,x)
+    return np.array([x_[0]/x_[2],x_[1]/x_[2]])
 
 def detect(image):
     aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_250)
-
-    # Define the parameters for marker detection
     parameters = aruco.DetectorParameters()
-
-    # Detect ArUco markers in the image
     detector = aruco.ArucoDetector(aruco_dict,parameters)
-
     markerCorners, markerIds, rejectedCandidates = detector.detectMarkers(image)
-    # Draw the detected markers on the image
     order=[0,1,2,3]
     box=[0,0,0,0]
     markers={}
     for i in range(len(markerCorners)):
         image=cv.polylines(image,markerCorners[i].astype('int32'),True,(255,0,0),2)
-        image=cv.putText(image,str(markerIds[i][0]),markerCorners[i].mean(axis=1)[0].astype('int32'),cv.FONT_HERSHEY_SIMPLEX,color=(0,0,255),thickness=4,fontScale=2)
+        # image=cv.putText(image,str(markerIds[i][0]),markerCorners[i].mean(axis=1)[0].astype('int32'),cv.FONT_HERSHEY_SIMPLEX,color=(0,0,255),thickness=4,fontScale=2)
         try:
             box[order.index(markerIds[i][0])]=markerCorners[i].mean(axis=1)[0].astype('int32')
         except:
@@ -30,9 +30,11 @@ def detect(image):
         image=cv.polylines(image,[np.array(box)],True,(0,255,0),2)
         if len(box)==4:
             inp=np.float32(box)
-            out=np.float32([[0,0],[0,500],[500,500],[500,0]])
+            out=np.float32([[0,0],[500,0],[500,500],[0,500]])
             matrix = cv.getPerspectiveTransform(inp, out)
             image = cv.warpPerspective(image, matrix, (500, 500))
+            for id in markers:
+                markers[id]=transformation(matrix,markers[id])
     except:
         return False,image , markers
     return True, image, markers
@@ -47,20 +49,17 @@ class MobileCamera:
         ref, frame = self.cap.read()
         frame = cv.resize(frame, (0, 0), fx=0.5, fy=0.5)
         value1,image, markers=detect(frame)
-        while not value1:
+        while not value1 or len(markers)==0:
             ref, frame = self.cap.read()
             frame = cv.resize(frame, (0, 0), fx=0.5, fy=0.5)
-            value1,image, markers=detect(frame)
-            if value1:
-                cv.imwrite('aruco.jpg',image)
-            cv.imshow("mobileCam",image)
-            if cv.waitKey(1) == ord('q'):
-                break
-        
-        print(markers)
+            value1,image, markers=detect(frame)        
         self.cap.release()
-        cv.destroyAllWindows()
+        return markers,image
 
 
-cam = MobileCamera("http://192.168.93.192:1111/video")
-cam.getImage()
+cam = MobileCamera("http://192.168.0.119:1111/video")
+markers,image=cam.getImage()
+print(markers)
+cv.imshow('Area',image)
+cv.waitKey(0)
+cv.destroyAllWindows()
