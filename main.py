@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FFMpegWriter, FuncAnimation
 from bots import Bot, Box
 import seaborn as sns
+import time
 
 MAP = np.zeros((25, 25))
 MAP_T = np.zeros((25, 25))
@@ -33,6 +34,7 @@ bots=sorted(bots,key= lambda x: x.Dist(x.box)+x.box.Dist(x.target))
 
 p, t, tb = [], [], []
 
+start=time.time()
 for i in range(numBots):
     p1, t1, tb1 = bots[i].createPath(MAP, MAP_T)
     p.append(p1)
@@ -42,6 +44,9 @@ for i in range(numBots):
     MAP[list(map(list, p[i].T))] = 100
     MAP_T[list(map(list, p[i].T))] = t[i]
     MAP_T[p[i][-1][0], p[i][-1][1]] = np.inf
+end=time.time()
+
+print(f'Processing time: {end-start}')
 
 figure2 = plt.figure(figsize=(6, 6))
 ax2 = figure2.add_subplot(111,projection='3d')

@@ -7,7 +7,7 @@ def transformation(matrix,coordinate):
     x[0]=coordinate[0]
     x[1]=coordinate[1]
     x_=np.matmul(matrix,x)
-    return np.array([x_[0]/x_[2],x_[1]/x_[2]])
+    return np.array([x_[0]/x_[2],x_[1]/x_[2]],dtype='int').reshape(2,)
 
 def detect(image):
     aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_250)
@@ -19,15 +19,15 @@ def detect(image):
     markers={}
     for i in range(len(markerCorners)):
         image=cv.polylines(image,markerCorners[i].astype('int32'),True,(255,0,0),2)
-        # image=cv.putText(image,str(markerIds[i][0]),markerCorners[i].mean(axis=1)[0].astype('int32'),cv.FONT_HERSHEY_SIMPLEX,color=(0,0,255),thickness=4,fontScale=2)
+        image=cv.putText(image,str(markerIds[i][0]),markerCorners[i].mean(axis=1)[0].astype('int32'),cv.FONT_HERSHEY_SIMPLEX,color=(0,0,255),thickness=1,fontScale=0.3)
         try:
             box[order.index(markerIds[i][0])]=markerCorners[i].mean(axis=1)[0].astype('int32')
         except:
-            if markerIds[i][0]>3 and markerIds[i][0]<6:
+            if markerIds[i][0] not in order:
                 markers[markerIds[i][0]]=markerCorners[i].mean(axis=1)[0].astype('int32')
             continue
     try:
-        image=cv.polylines(image,[np.array(box)],True,(0,255,0),2)
+        image=cv.polylines(image,np.array([box]),True,(0,255,0),2)
         if len(box)==4:
             inp=np.float32(box)
             out=np.float32([[0,0],[500,0],[500,500],[0,500]])
@@ -56,10 +56,13 @@ class MobileCamera:
         self.cap.release()
         return markers,image
 
-
-cam = MobileCamera("http://192.168.0.119:1111/video")
-markers,image=cam.getImage()
-print(markers)
-cv.imshow('Area',image)
-cv.waitKey(0)
-cv.destroyAllWindows()
+if __name__=='__main__':
+    cam = MobileCamera("http://192.168.0.119:1111/video")
+    markers,image=cam.getImage()
+    # inp=cv.imread('images/aruc0.png')
+    # val,image,markers=detect(inp)
+    print(markers)
+    cv.imshow('Area',image)
+    cv.imwrite('images/aruco.jpg',image)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
