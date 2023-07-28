@@ -2,6 +2,7 @@ import numpy as np
 from aStar import Map
 from scipy.interpolate import CubicSpline as cs
 from camera import MobileCamera
+from control import *
 cam = MobileCamera("http://192.168.0.119:1111/video")
 
 class Box:
@@ -19,10 +20,11 @@ class Box:
 
 
 class Bot:
-    def __init__(self, x, y, id):
+    def __init__(self, x, y, theta, id):
         self.id=id
         self.x = x
         self.y = y
+        self.theta = theta
         self.pos = [self.x, self.y]
         self.box = None
         self.target = None
@@ -36,6 +38,11 @@ class Bot:
         delX = self.x-point.x
         delY = self.y-point.y
         return np.sqrt(delX**2+delY**2)
+    
+    def Dist1(self, point):
+        delX = self.x-point[0]
+        delY = self.y-point[1]
+        return np.sqrt(delX**2+delY**2)
 
     def assignBox(self, box):
         self.box = box
@@ -48,10 +55,14 @@ class Bot:
         return markers[self.id]
 
     def updatePos(self):
-        self.x,self.y=self.getPos()
+        self.x,self.y, self.theta=self.getPos()
         self.pos = [self.x, self.y]
         if self.Dist(self.box) <= 0.2:
+            MagnetOn(self.id)
             self.reachedBox = True
+
+        if self.Dist1(self.target) <= 0.2:
+            MagnetOff(self.id)
 
         if self.reachedBox:
             self.box.x = self.x

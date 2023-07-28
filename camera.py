@@ -22,7 +22,11 @@ def detectInsides(image):
     detector = aruco.ArucoDetector(aruco_dict,parameters)
     markerCorners, markerIds, rejectedCandidates = detector.detectMarkers(image)
     markers={}
-
+    for i in range(len(markerCorners)):
+        center=markerCorners[i].mean(axis=1)[0].astype('int32')
+        theta=orientation(*markerCorners[i])
+        markers[markerIds[i]]=(center[0],center[1],theta)
+    return markers
 
 def detect(image):
     aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_250)
