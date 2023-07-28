@@ -27,7 +27,8 @@ class Bot:
         self.path = None
         self.t = None
         self.reachedBox = False
-        self.posFunc = None
+        self.position = None
+        self.dxdy=None
 
     def Dist(self, point):
         delX = self.x-point.x
@@ -68,10 +69,15 @@ class Bot:
         path2, t2 = self.path2target(map, mapT, t1[-1])
         self.path = np.insert(path2, 0, path1[:-1], axis=0)
         self.t = np.insert(t2, 0, t1[:-1], axis=0)
-        self.posFunc = cs(self.t, self.path)
+        self.position = cs(self.t, self.path)
+        self.dxdy = self.position.derivative(1)
         return self.path, self.t, t1[-1]
 
+    def orientation(self,t):
+        der=self.dxdy(t).reshape(-1,2)
+        return np.arctan2(der[:,0],der[:,1])*180/np.pi
+
     def returnPos(self, t):
-        pt = self.posFunc(t/10)
+        pt = self.position(t/10)
         self.updatePos(pt)
         return pt

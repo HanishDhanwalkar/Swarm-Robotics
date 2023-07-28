@@ -50,43 +50,47 @@ print(f'Processing time: {end-start}')
 
 figure2 = plt.figure(figsize=(6, 6))
 ax2 = figure2.add_subplot(111,projection='3d')
+ti=np.linspace(0,bots[1].t[-1])
+path=bots[1].position(ti)
+x=path[:,0]
+y=path[:,1]
+theta=bots[1].orientation(ti)
+ax2.scatter(x,y,ti)
 ax2.set_xlim(-1, 25)
 ax2.set_ylim(-1, 25)
 ax2.scatter(obstacles[:, 0], obstacles[:, 1], [0],
             marker='.', color='k', zorder=2)
 
-plotBots, plotBoxes, plotDests, plotPaths = [], [], [], []
-clrs = ['r', 'g', 'b', 'k']
+# plotBots, plotBoxes, plotDests, plotPaths = [], [], [], []
+# clrs = ['r', 'g', 'b', 'k']
 
-for i in range(numBots):
-    plotBots.append(ax2.scatter([bots[i].pos[0]], [bots[i].pos[1]],[0], marker='o',
-                    color=clrs[i], label=f'Bot {i+1}', zorder=3))
-    plotBoxes.append(ax2.scatter([bots[i].box.pos[0]], [bots[i].box.pos[1]],[bots[i].box.reachtime], marker='d',
-                                 color=clrs[i], label=f'Box {i+1}', zorder=3))
-    plotDests.append(ax2.scatter([bots[i].target[0]], [bots[i].target[1]],[t[i][-1]], marker='*',
-                                 color=clrs[i], label=f'Dest {i+1}', zorder=3))
-    plotPaths.append(ax2.plot(p[i][:, 0], p[i][:, 1],t[i],
-                     color=clrs[i], label='Path 1', zorder=2))
+# for i in range(numBots):
+#     plotBots.append(ax2.scatter([bots[i].pos[0]], [bots[i].pos[1]],[0], marker='o',
+#                     color=clrs[i], label=f'Bot {i+1}', zorder=3))
+#     plotBoxes.append(ax2.scatter([bots[i].box.pos[0]], [bots[i].box.pos[1]],[bots[i].box.reachtime], marker='d',
+#                                  color=clrs[i], label=f'Box {i+1}', zorder=3))
+#     plotDests.append(ax2.scatter([bots[i].target[0]], [bots[i].target[1]],[t[i][-1]], marker='*',
+#                                  color=clrs[i], label=f'Dest {i+1}', zorder=3))
+#     plotPaths.append(ax2.plot(p[i][:, 0], p[i][:, 1],t[i],
+#                      color=clrs[i], label='Path 1', zorder=2))
 
-plt.xlabel('x')
-plt.ylabel('y')
+# plt.xlabel('x')
+# plt.ylabel('y')
 
-maxtime = 0
-for i in range(numBots):
-    print(bots[i].t[-1])
-    if bots[i].t[-1] > maxtime:
-        maxtime = bots[i].t[-1]
+# maxtime = 0
+# for i in range(numBots):
+#     print(bots[i].t[-1])
+#     if bots[i].t[-1] > maxtime:
+#         maxtime = bots[i].t[-1]
 
-# sns.heatmap(MAP_T.T,vmin=0,vmax=maxtime)
-# plt.legend()
 plt.show()
 
 
-def animate(i):
-    for j in range(numBots):
-        lim = min(i, 10*bots[j].t[-1])
-        plotBots[j].set_offsets(bots[j].returnPos(lim))
-        plotBoxes[j].set_offsets([boxes[j].pos[0], boxes[j].pos[1]])
+# def animate(i):
+#     for j in range(numBots):
+#         lim = min(i, 10*bots[j].t[-1])
+#         plotBots[j].set_offsets(bots[j].returnPos(lim))
+#         plotBoxes[j].set_offsets([boxes[j].pos[0], boxes[j].pos[1]])
 
 
 # anim = FuncAnimation(figure2, animate, 10 * int(maxtime+2), interval=2)
