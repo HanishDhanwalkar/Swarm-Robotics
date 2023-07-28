@@ -24,7 +24,11 @@ class Bot:
         self.id=id
         self.x = x
         self.y = y
+        self.x_prev = None
+        self.y_prev = None
+        self.pos_prev = [self.x_prev,self.y_prev]
         self.theta = theta
+        self.theta_prev = None
         self.pos = [self.x, self.y]
         self.box = None
         self.target = None
@@ -33,6 +37,8 @@ class Bot:
         self.reachedBox = False
         self.position = None
         self.dxdy=None
+        self.speed = None
+        self.omega = None
 
     def Dist(self, point):
         delX = self.x-point.x
@@ -55,6 +61,12 @@ class Bot:
         return markers[self.id]
 
     def updatePos(self):
+        self.x_prev = self.x
+        self.y_prev = self.y
+        self.pos_prev = [self.x_prev,self.y_prev]
+        self.speed = self.Dist(self.pos_prev)
+        self.theta_prev = self.theta
+        self.omega = self.theta - self.theta_prev
         self.x,self.y, self.theta=self.getPos()
         self.pos = [self.x, self.y]
         if self.Dist(self.box) <= 0.2:
@@ -68,6 +80,10 @@ class Bot:
             self.box.x = self.x
             self.box.y = self.y
             self.box.pos = [self.x, self.y]
+
+
+    def updateTheta(self):
+        self.theta_prev = self.theta
 
     def path2box(self, map, mapT):
         w, h = map.shape
