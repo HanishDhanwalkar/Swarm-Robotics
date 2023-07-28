@@ -64,7 +64,7 @@ class Bot:
         self.x_prev = self.x
         self.y_prev = self.y
         self.pos_prev = [self.x_prev,self.y_prev]
-        self.speed = self.Dist(self.pos_prev)
+        self.speed = self.Dist1(self.pos_prev)
         self.theta_prev = self.theta
         self.omega = self.theta - self.theta_prev
         self.x,self.y, self.theta=self.getPos()
