@@ -3,6 +3,7 @@ import time
 
 url='http://192.168.4.1/control?'
 
-requests.get(url+'right')
-time.sleep(2)
-requests.get(url+'off')
+def control(id,vright,vleft,dt):
+    requests.get(url+f"id={id}&vright={vright}&vleft={vleft}")
+    time.sleep(dt)
+    requests.get(url+'stop')

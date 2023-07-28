@@ -1,7 +1,8 @@
 import numpy as np
 from aStar import Map
 from scipy.interpolate import CubicSpline as cs
-
+from camera import MobileCamera
+cam = MobileCamera("http://192.168.0.119:1111/video")
 
 class Box:
     def __init__(self, x, y):
@@ -18,7 +19,8 @@ class Box:
 
 
 class Bot:
-    def __init__(self, x, y):
+    def __init__(self, x, y, id):
+        self.id=id
         self.x = x
         self.y = y
         self.pos = [self.x, self.y]
@@ -39,9 +41,14 @@ class Bot:
         self.box = box
         self.target = box.dest
 
-    def updatePos(self, pt):
-        self.x = pt[0]
-        self.y = pt[1]
+    def getPos(self):
+        markers,image=cam.getImage()
+        while self.id not in markers:
+            markers,image=cam.getImage()
+        return markers[self.id]
+
+    def updatePos(self):
+        self.x,self.y=self.getPos()
         self.pos = [self.x, self.y]
         if self.Dist(self.box) <= 0.2:
             self.reachedBox = True

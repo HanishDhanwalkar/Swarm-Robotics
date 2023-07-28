@@ -17,8 +17,12 @@ markers,image=cam.getImage()
 while not (4 in markers and 5 in markers):
     markers,image=cam.getImage()
 
-x_init=markers[4]
-x_final=markers[5]
+bots=[]
+for i in markers:
+    bots.append(*markers[i],i)
+
+x_init=bots[0].pos
+x_final=bots[1].pos
 
 m=Map(500, 500, MAP, x_init, x_final, MAP_T)
 path, t = m.getPath()
