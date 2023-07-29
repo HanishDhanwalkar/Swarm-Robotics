@@ -54,14 +54,172 @@ for i in range(numBots):
     MAP_T[p[i][-1][0], p[i][-1][1]] = np.inf
 end=time.time()
 
+tic = time.time()
 while True:
     for bot in bots:
+        toc = time.time()
+        t = toc - tic
+        bot.updatePos()
         exp_pos = bot.position(t)
         dr = bot.distFromPoint(exp_pos)
         dtheta = bot.orientation(t) - bot.theta
         V = Kp_r*dr + Kd_r*bot.speed
         Vleft = V - Kp_theta*dtheta - Kd_theta*bot.omega
         Vright = V + Kp_theta*dtheta + Kd_theta*bot.omega
+        control(bot.id,Vright,Vleft)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 print(f'Processing time: {end-start}')
