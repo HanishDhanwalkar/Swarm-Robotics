@@ -5,13 +5,14 @@ from camera import MobileCamera
 from control import *
 cam = MobileCamera("http://192.168.0.119:1111/video")
 
+
 class Box:
     def __init__(self, x, y):
         self.x = x
         self.y = y
         self.pos = [self.x, self.y]
         self.dest = None
-        self.reachtime=np.inf
+        self.reachtime = np.inf
 
     def Dist(self, point):
         delX = self.x-point[0]
@@ -20,32 +21,30 @@ class Box:
 
 
 class Bot:
-    def __init__(self, x, y, theta, id):
-        self.id=id
-        self.x = x
-        self.y = y
+    def __init__(self, id):
+        self.id = id
+        self.x, self.y, self.theta = self.getPos()
+        self.pos = [self.x, self.y]
         self.x_prev = None
         self.y_prev = None
-        self.pos_prev = [self.x_prev,self.y_prev]
-        self.theta = theta
         self.theta_prev = None
-        self.pos = [self.x, self.y]
+        self.pos_prev = [self.x_prev, self.y_prev]
         self.box = None
         self.target = None
         self.path = None
         self.t = None
         self.reachedBox = False
         self.position = None
-        self.dxdy=None
+        self.dxdy = None
         self.speed = None
         self.omega = None
 
-    def Dist(self, point):
-        delX = self.x-point.x
-        delY = self.y-point.y
+    def distFromBox(self, box):
+        delX = self.x-box.x
+        delY = self.y-box.y
         return np.sqrt(delX**2+delY**2)
-    
-    def Dist1(self, point):
+
+    def distFromPoint(self, point):
         delX = self.x-point[0]
         delY = self.y-point[1]
         return np.sqrt(delX**2+delY**2)
@@ -55,25 +54,25 @@ class Bot:
         self.target = box.dest
 
     def getPos(self):
-        markers,image=cam.getImage()
-        while self.id not in markers:
-            markers,image=cam.getImage()
-        return markers[self.id]
+        pos = None
+        while pos != None:
+            pos = cam.getPosOfID(self.id)
+        return pos
 
     def updatePos(self):
         self.x_prev = self.x
         self.y_prev = self.y
-        self.pos_prev = [self.x_prev,self.y_prev]
-        self.speed = self.Dist1(self.pos_prev)
         self.theta_prev = self.theta
+        self.pos_prev = [self.x_prev, self.y_prev]
+        self.speed = self.distFromPoint(self.pos_prev)
         self.omega = self.theta - self.theta_prev
-        self.x,self.y, self.theta=self.getPos()
+        self.x, self.y, self.theta = self.getPos()
         self.pos = [self.x, self.y]
-        if self.Dist(self.box) <= 0.2:
+        if self.distFromBox(self.box) <= 0.2:
             MagnetOn(self.id)
             self.reachedBox = True
 
-        if self.Dist1(self.target) <= 0.2:
+        if self.distFromPoint(self.target) <= 0.2:
             MagnetOff(self.id)
 
         if self.reachedBox:
@@ -81,15 +80,11 @@ class Bot:
             self.box.y = self.y
             self.box.pos = [self.x, self.y]
 
-
-    def updateTheta(self):
-        self.theta_prev = self.theta
-
     def path2box(self, map, mapT):
         w, h = map.shape
         m = Map(w, h, map, self.pos, self.box.pos, mapT)
         path, t = m.getPath()
-        self.box.reachtime=t[0]
+        self.box.reachtime = t[0]
         return path[::-1], t[::-1]
 
     def path2target(self, map, mapT, tStart):
@@ -107,9 +102,9 @@ class Bot:
         self.dxdy = self.position.derivative(1)
         return self.path, self.t, t1[-1]
 
-    def orientation(self,t):
-        der=self.dxdy(t).reshape(-1,2)
-        return np.arctan2(der[:,0],der[:,1])*180/np.pi
+    def orientation(self, t):
+        der = self.dxdy(t).reshape(-1, 2)
+        return np.arctan2(der[:, 0], der[:, 1])*180/np.pi
 
     def returnPos(self, t):
         pt = self.position(t/10)
