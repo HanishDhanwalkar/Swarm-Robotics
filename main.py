@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FFMpegWriter, FuncAnimation
 from bots import Bot, Box
 import seaborn as sns
+from control import control
 import time
 
 MAP = np.zeros((25, 25))
@@ -30,7 +31,7 @@ for i in range(numBots):
     boxes[i].dest = dests[i]
     bots[i].assignBox(boxes[i])
 
-bots=
+bots=[]
 
 
 sorted(bots,key= lambda x: x.Dist(x.box)+x.box.Dist(x.target))
@@ -59,13 +60,21 @@ while True:
     for bot in bots:
         toc = time.time()
         t = toc - tic
-        bot.updatePos()
+        bot.updatePos
         exp_pos = bot.position(t)
         dr = bot.distFromPoint(exp_pos)
         dtheta = bot.orientation(t) - bot.theta
         V = Kp_r*dr + Kd_r*bot.speed
-        Vleft = V - Kp_theta*dtheta - Kd_theta*bot.omega
-        Vright = V + Kp_theta*dtheta + Kd_theta*bot.omega
+        Vleft = int(V - Kp_theta*dtheta - Kd_theta*bot.omega)
+        Vright = int(V + Kp_theta*dtheta + Kd_theta*bot.omega)
+        if Vleft > 255:
+            Vleft = 255
+        if Vleft < -255:
+            Vleft = -255
+        if Vright > 255:
+            Vright = 255
+        if Vright < -255:
+            Vright = -255
         control(bot.id,Vright,Vleft)
 
 

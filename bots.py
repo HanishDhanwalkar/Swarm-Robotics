@@ -3,13 +3,13 @@ from aStar import Map
 from scipy.interpolate import CubicSpline as cs
 from camera import MobileCamera
 from control import *
-cam = MobileCamera("http://192.168.0.117:1111/video")
+cam = MobileCamera("http://192.168.4.3:8080/video")
 
 
 class Box:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+    def __init__(self, id):
+        self.id = id
+        self.x, self.y, self.theta = self.getPos()
         self.pos = [self.x, self.y]
         self.dest = None
         self.reachtime = np.inf
@@ -18,6 +18,12 @@ class Box:
         delX = self.x-point[0]
         delY = self.y-point[1]
         return np.sqrt(delX**2+delY**2)
+    
+    def getPos(self):
+        pos = None
+        while not pos:
+            pos = cam.getPosOfID(self.id)
+        return pos
 
 
 class Bot:

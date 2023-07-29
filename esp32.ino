@@ -20,11 +20,11 @@ int inp2 = 12;
 int inp3 = 22; // Choose your GPIO pin of esp32 for the input 3
 int inp4 = 21; // Choose your GPIO pin of esp32 for the input 4
 
-int magnet = 55; // change it
+int magnet = 27; // change it
 
 int led = 2; // until now you must know what is the inbuilt led pin number of esp32.
 
-const id = 1; // change for each bot same as aruco marker id
+int const id = 1; // change for each bot same as aruco marker id
 
 void setup()
 {
@@ -33,7 +33,7 @@ void setup()
     pinMode(LED_BUILTIN, OUTPUT);
     pinMode(enable1_2, OUTPUT);
     pinMode(enable3_4, OUTPUT);
-    Serial.begin(921600);
+    Serial.begin(115200);
 
     // The inputs
     // pinMode(int pinNum, MODE) is the function which sets the functional mode of the corresponding pin
@@ -58,38 +58,38 @@ void setup()
     // A bit of WEB DEV stuff
     server.on("/control", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-        if(request->hasArg('id') & (int)(request->getParam('id')->value())==id){    
+        if(request->hasArg("id") & (request->getParam("id")->value()).toInt()==id){    
             if(request->hasArg("vright")){ 
-                int vright = (int)(request->getParam('vright')->value());
+                String vright = request->getParam("vright")->value();
             // if '255' is the equivalent to digital '1', and '0' is eqvivalent to digial '0', We vary the pwm values to vary the speed of the motor
-                if(vright>=0){    
+                if(vright.toInt()>=0){    
                     digitalWrite(inp1, HIGH);
                     digitalWrite(inp2, LOW);
                 }else{
-                    digitalWrite(inp1, Low);
-                    digitalWrite(inp2, High);
+                    digitalWrite(inp1, LOW);
+                    digitalWrite(inp2, HIGH);
                 }  
-                analogWrite(enable1_2, abs(vright));   
+                analogWrite(enable1_2, abs(vright.toInt()));   
                 }
 
             if(request->hasArg("vleft")){ 
-                int vleft = (int)(request->getParam('vleft')->value());
+                String vleft = request->getParam("vleft")->value();
             // if '255' is the equivalent to digital '1', and '0' is eqvivalent to digial '0', We vary the pwm values to vary the speed of the motor
-                if(vleft>=0){    
+                if(vleft.toInt()>=0){    
                     digitalWrite(inp3, HIGH);
                     digitalWrite(inp4, LOW);
                 }else{
-                    digitalWrite(inp3, Low);
-                    digitalWrite(inp4, High);
+                    digitalWrite(inp3, LOW);
+                    digitalWrite(inp4, HIGH);
                 }  
-                analogWrite(enable3_4, abs(vleft));   
+                analogWrite(enable3_4, abs(vleft.toInt()));   
                 }
             if(request->hasArg("magnet")){  
-               int val = (int)(request->getParam('magnet')->value()); 
-               if(val){
-                digitalWrite(magnet,High);
+               String val = request->getParam("magnet")->value(); 
+               if(val.toInt()){
+                digitalWrite(magnet,HIGH);
                }else{
-                digitalWrite(magnet,Low);
+                digitalWrite(magnet,LOW);
                }
                 }           
             }

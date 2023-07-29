@@ -98,7 +98,9 @@ class Map:
             del self.openSet[self.openSet.index(curr)]
 
             neighbours = curr.getNeighbours()
-            neighbours = self.nodes[neighbours]
+            neighboursX=neighbours[0]
+            neighboursY=neighbours[1]
+            neighbours = self.nodes[neighboursX,neighboursY]
 
             for neighbour in neighbours:
                 newGScore = self.updatedGScore(curr, neighbour)
