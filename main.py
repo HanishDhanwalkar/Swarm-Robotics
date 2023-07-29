@@ -30,9 +30,17 @@ for i in range(numBots):
     boxes[i].dest = dests[i]
     bots[i].assignBox(boxes[i])
 
-bots=sorted(bots,key= lambda x: x.Dist(x.box)+x.box.Dist(x.target))
+bots=
+
+
+sorted(bots,key= lambda x: x.Dist(x.box)+x.box.Dist(x.target))
 
 p, t, tb = [], [], []
+
+Kp_r = 100
+Kp_theta = 100
+Kd_r = 100
+Kd_theta = 100
 
 start=time.time()
 for i in range(numBots):
@@ -45,6 +53,16 @@ for i in range(numBots):
     MAP_T[list(map(list, p[i].T))] = t[i]
     MAP_T[p[i][-1][0], p[i][-1][1]] = np.inf
 end=time.time()
+
+while True:
+    for bot in bots:
+        exp_pos = bot.position(t)
+        dr = bot.distFromPoint(exp_pos)
+        dtheta = bot.orientation(t) - bot.theta
+        V = Kp_r*dr + Kd_r*bot.speed
+        Vleft = V - Kp_theta*dtheta - Kd_theta*bot.omega
+        Vright = V + Kp_theta*dtheta + Kd_theta*bot.omega
+
 
 print(f'Processing time: {end-start}')
 
