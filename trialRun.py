@@ -5,7 +5,7 @@ import time
 from camera import MobileCamera
 from bots import Bot
 
-camera = MobileCamera("http://192.168.0.119:1111/video")
+camera = MobileCamera("http://192.168.0.117:1111/video")
 
 MAP = np.zeros((500, 500))
 MAP_T = np.zeros((500, 500))

@@ -3,7 +3,7 @@ from aStar import Map
 from scipy.interpolate import CubicSpline as cs
 from camera import MobileCamera
 from control import *
-cam = MobileCamera("http://192.168.0.119:1111/video")
+cam = MobileCamera("http://192.168.0.117:1111/video")
 
 
 class Box:
@@ -55,8 +55,11 @@ class Bot:
 
     def getPos(self):
         pos = None
-        while pos != None:
+        count=0
+        while not pos:
+            count+=1
             pos = cam.getPosOfID(self.id)
+        print(pos,count)
         return pos
 
     def updatePos(self):
