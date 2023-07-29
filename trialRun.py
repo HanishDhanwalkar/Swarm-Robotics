@@ -23,6 +23,8 @@ for id in botIDs:
 x_init = bots[0].pos
 x_final = bots[1].pos
 
+print(bots[0].theta,bots[1].theta)
+
 m = Map(500, 500, MAP, x_init, x_final, MAP_T)
 path, t = m.getPath()
 

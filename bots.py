@@ -55,11 +55,8 @@ class Bot:
 
     def getPos(self):
         pos = None
-        count=0
         while not pos:
-            count+=1
             pos = cam.getPosOfID(self.id)
-        print(pos,count)
         return pos
 
     def updatePos(self):

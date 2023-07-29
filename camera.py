@@ -49,7 +49,6 @@ class MobileCamera:
             corners = self.getCorners(image)
         inp = np.float32(corners)
         out = np.float32([[0, 0], [500, 0], [500, 500], [0, 500]])
-        print(inp,out)
         matrix = cv.getPerspectiveTransform(inp, out)
         image = cv.warpPerspective(image, matrix, (500, 500))
         return image
