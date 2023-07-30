@@ -7,14 +7,27 @@ cam = MobileCamera("http://192.168.4.3:8080/video")
 
 
 class Box:
-    def __init__(self, id):
+    def __init__(self, id: int):   
+        """
+        Constructor
+        Args:
+            id (int): ID of the box, same as ID of ArUco marker on the box
+        """             
         self.id = id
         self.x, self.y, self.theta = self.getPos()
         self.pos = [self.x, self.y]
         self.dest = None
         self.reachtime = np.inf
 
-    def Dist(self, point):
+    def Dist(self, point: list[2]) -> float:
+        """_summary_
+
+        Args:
+            point (list[2]): _description_
+
+        Returns:
+            float: _description_
+        """                
         delX = self.x-point[0]
         delY = self.y-point[1]
         return np.sqrt(delX**2+delY**2)

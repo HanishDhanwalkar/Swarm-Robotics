@@ -2,7 +2,7 @@ import socket
  
 s = socket.socket()         
  
-s.bind(('0.0.0.0', 8090 ))
+s.bind(('192.168.231.164', 8090 ))
 s.listen(0)                 
  
 while True:
