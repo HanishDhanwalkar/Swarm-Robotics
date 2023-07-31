@@ -1,64 +1,83 @@
-
-// Including the following libraries is a must to use the IoT functions and features of esp32
-#include "WiFi.h"
+#include <WiFi.h>
+#include <HTTPClient.h>
 #include "ESPAsyncWebSrv.h"
+  
+const char* ssid = "VN";
+const char* password =  "halloween123";
 
-const char *ssid = "TechMinds_Bot1"; // This will show up when you turn on your mobile WIFI
-const char *password = "12345687";   // change to more unique password
+AsyncWebServer server(80); 
 
-AsyncWebServer server(80); // These will start the webserver // If you don't know much, Ignore this line
-
-// These pins are the Enable pins of the L293D motor driver which connects to esp32 gpio pins to implement the PWM function
 int enable1_2 = 14;
 int enable3_4 = 23;
+int enable_magnet=26;
 
-// These pins are the input pins of l293d on the left side
 int inp1 = 13;
 int inp2 = 12;
 
-// These pins are the input pins of l293d on the right side
-int inp3 = 22; // Choose your GPIO pin of esp32 for the input 3
-int inp4 = 21; // Choose your GPIO pin of esp32 for the input 4
+int inp3 = 22;
+int inp4 = 21;
 
-int magnet = 27; // change it
+int magnet = 27; 
 
-int led = 2; // until now you must know what is the inbuilt led pin number of esp32.
+int led = 2; 
 
-int const id = 1; // change for each bot same as aruco marker id
+const String id="4";
 
-void setup()
-{
+int sendID(HTTPClient http,String id){
+   http.begin("http://192.168.231.118:8080/");  //Specify destination for HTTP request
+   http.addHeader("Content-Type", "text/plain");             //Specify content-type header
+   http.addHeader("id", id);
+   http.addHeader("ip", WiFi.localIP().toString().c_str());    
+   int httpResponseCode = http.POST("POSTING from ESP32");   //Send the actual POST request
+   if(httpResponseCode>0){
+    String response = http.getString(); //Get the response to the request
+    Serial.println(httpResponseCode);   //Print return code
+    Serial.println(response);           //Print request answer
+   }
+   while(httpResponseCode!=200){
+    http.begin("http://192.168.231.164:8080/");  //Specify destination for HTTP request
+    http.addHeader("Content-Type", "text/plain");             //Specify content-type header
+    http.addHeader("id", id);
+    http.addHeader("ip", WiFi.localIP().toString().c_str());    
+    int httpResponseCode = http.POST("POSTING from ESP32");   //Send the actual POST request
+    if(httpResponseCode>0){
+      String response = http.getString(); //Get the response to the request
+      Serial.println(httpResponseCode);   //Print return code
+      Serial.println(response);           //Print request answer
+    }
+   }
+   http.end();  //Free resources
+}
 
-    // Fill in the blanks
-    pinMode(LED_BUILTIN, OUTPUT);
-    pinMode(enable1_2, OUTPUT);
-    pinMode(enable3_4, OUTPUT);
-    Serial.begin(115200);
+void connectWiFi(){
+  WiFi.begin(ssid, password); 
+  while (WiFi.status() != WL_CONNECTED) { //Check for the connection
+    delay(1000);
+    Serial.println("Connecting to WiFi..");
+  }
+  Serial.println("Connected to the WiFi network");  
+}
 
-    // The inputs
-    // pinMode(int pinNum, MODE) is the function which sets the functional mode of the corresponding pin
-    // where first argument is the pin number and the second argument is the mode eg. OUTPUT, INPUT.
-    pinMode(inp1, OUTPUT);
-    pinMode(inp2, OUTPUT);
-    pinMode(inp3, OUTPUT);
-    pinMode(inp4, OUTPUT);
-
-    pinMode(led, OUTPUT);
-
-    pinMode(magnet, OUTPUT);
-
-    // We use the following function to run the bot at variable speed.
-    analogWrite(enable1_2, 255); // analog write "255" corresponds to digital write "1"
-    analogWrite(enable3_4, 255);
-
-    WiFi.softAP(ssid, password); // This sets your esp32's name as per above mentioned
-
-    IPAddress IP = WiFi.softAPIP();
-
-    // A bit of WEB DEV stuff
-    server.on("/control", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-        if(request->hasArg("id") & (request->getParam("id")->value()).toInt()==id){    
+void setup() {
+  Serial.begin(115200);
+  delay(4000);   //Delay needed before calling the WiFi.begin
+  connectWiFi();
+  HTTPClient http; 
+  http.begin("http://192.168.231.118:8080/");  //Specify destination for HTTP request
+   http.addHeader("Content-Type", "text/plain");             //Specify content-type header
+   http.addHeader("id", id);
+   http.addHeader("ip", WiFi.localIP().toString().c_str());    
+   int httpResponseCode = http.POST("POSTING from ESP32");   //Send the actual POST request
+   if(httpResponseCode>0){
+    String response = http.getString(); //Get the response to the request
+    Serial.println(httpResponseCode);   //Print return code
+    Serial.println(response);           //Print request answer
+   }else{
+    Serial.println(httpResponseCode);
+    }
+  server.on("/control", HTTP_GET, [](AsyncWebServerRequest *request)
+        {
+        if(request->hasArg("id") & (request->getParam("id")->value()).toInt()==id.toInt()){    
             if(request->hasArg("vright")){ 
                 String vright = request->getParam("vright")->value();
             // if '255' is the equivalent to digital '1', and '0' is eqvivalent to digial '0', We vary the pwm values to vary the speed of the motor
@@ -71,7 +90,6 @@ void setup()
                 }  
                 analogWrite(enable1_2, abs(vright.toInt()));   
                 }
-
             if(request->hasArg("vleft")){ 
                 String vleft = request->getParam("vleft")->value();
             // if '255' is the equivalent to digital '1', and '0' is eqvivalent to digial '0', We vary the pwm values to vary the speed of the motor
@@ -93,17 +111,10 @@ void setup()
                }
                 }           
             }
-
-        
         request->send_P(200, "text/plain", ""); });
-
     server.begin();
 }
-
-void loop()
-{
-    digitalWrite(LED_BUILTIN, HIGH); // turn the LED on (HIGH is the voltage level)
-    delay(1000);                     // wait for a second
-    digitalWrite(LED_BUILTIN, LOW);  // turn the LED off by making the voltage LOW
-    delay(1000);
+  
+void loop() {
+  // Serial.println("Connected");
 }

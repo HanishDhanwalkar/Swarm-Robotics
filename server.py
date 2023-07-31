@@ -1,7 +1,8 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
+from control import control,MagnetOn,MagnetOff
 
-Settings = {"HOST": "192.168.231.164", "PORT": 8080}
+Settings = {"HOST": "192.168.231.118", "PORT": 8080}
 
 
 class MainServer(BaseHTTPRequestHandler):
@@ -19,6 +20,8 @@ class MainServer(BaseHTTPRequestHandler):
         self.end_headers()
         print(f"Connected by {id} at {ip}")
         self.wfile.write(bytes(f"Connected by {id} at {ip}","utf-8"))
+        MagnetOn(id,ip)
+
 
 server=HTTPServer((Settings['HOST'],Settings['PORT']),MainServer)
 server.serve_forever()
