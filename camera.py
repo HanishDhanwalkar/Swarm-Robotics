@@ -8,9 +8,11 @@ class MobileCamera:
         self.cap = cv.VideoCapture(self.camera)
         self.detector = self.CreateDetector()
 
-    def getImage(self):
+    def getImage(self,debug=False):
         ref, frame = self.cap.read()
         frame = cv.resize(frame, (0, 0), fx=0.5, fy=0.5)
+        if debug:
+            frame=cv.imread('images/aruco.jpg')
         return frame
 
     def CreateDetector(self):
