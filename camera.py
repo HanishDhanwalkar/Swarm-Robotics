@@ -10,6 +10,7 @@ class MobileCamera:
 
     def getImage(self):
         ref, frame = self.cap.read()
+        print(ref)
         frame = cv.resize(frame, (0, 0), fx=0.5, fy=0.5)
         return frame
 
@@ -43,14 +44,15 @@ class MobileCamera:
 
     def getEnvironment(self):
         image = self.getImage()
+        # cv.imshow('cam',image)
         corners = self.getCorners(image)
         while len(corners) != 4:
             image = self.getImage()
             corners = self.getCorners(image)
         inp = np.float32(corners)
-        out = np.float32([[0, 0], [500, 0], [500, 500], [0, 500]])
+        out = np.float32([[0, 0], [610, 0], [610, 460], [0, 460]])
         matrix = cv.getPerspectiveTransform(inp, out)
-        image = cv.warpPerspective(image, matrix, (500, 500))
+        image = cv.warpPerspective(image, matrix, (610, 460))
         return image
 
     def getObjects(self, image):
@@ -72,12 +74,14 @@ class MobileCamera:
 
 
 if __name__ == '__main__':
-    cam = MobileCamera("http://192.168.0.119:1111/video")
-    markers, image = cam.getImage()
+    cam = MobileCamera("http://192.168.122.86:1111/video")
+    # markers, image = cam.getImage()
     # inp=cv.imread('images/aruc0.png')
     # val,image,markers=detect(inp)
-    print(markers)
-    cv.imshow('Area', image)
-    cv.imwrite('images/aruco.jpg', image)
-    cv.waitKey(0)
+    while True:
+        img=cam.getImage()
+        print(cam.getObjects(img))
+        cv.imshow('cam',img)
+        if cv.waitKey(25) & 0xFF == ord('q'):
+            break
     cv.destroyAllWindows()

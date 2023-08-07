@@ -2,9 +2,10 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 from control import control,MagnetOn,MagnetOff
 
-Settings = {"HOST": "192.168.231.118", "PORT": 8080}
+Settings = {"HOST": "192.168.122.118", "PORT": 8080}
 
 
+ID = {}
 class MainServer(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
@@ -13,16 +14,21 @@ class MainServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes(json.dumps(Settings),"utf-8"))
 
     def do_POST(self):
+        global ID
         id = int(self.headers['id'])
         ip = str(self.headers['ip'])
         self.send_response(200)
         self.send_header("Content-type","text/html")
         self.end_headers()
         print(f"Connected by {id} at {ip}")
+        ID[id]=ip
         self.wfile.write(bytes(f"Connected by {id} at {ip}","utf-8"))
-        MagnetOn(id,ip)
 
+def StartServer(numBots):
+    server=HTTPServer((Settings['HOST'],Settings['PORT']),MainServer)
+    while len(ID)!=numBots:
+        print(ID)
+        server.handle_request()
+    return ID
 
-server=HTTPServer((Settings['HOST'],Settings['PORT']),MainServer)
-server.serve_forever()
-server.server_close()
+# print(StartServer())

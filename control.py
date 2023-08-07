@@ -3,8 +3,8 @@ import time
 
 url='http://192.168.4.1/control?'
 
-def control(id,vright,vleft):
-    res=requests.get(url+f"id={id}&vright={vright}&vleft={vleft}")
+def control(id,ip,vright,vleft):
+    res=requests.get("http://{id}/control?id={id}&vright={vright}&vleft={vleft}")
     print(res,vleft,vright)
     
 def MagnetOn(id,ip):
@@ -13,3 +13,5 @@ def MagnetOn(id,ip):
 
 def MagnetOff(id):
     requests.get(url,f"http://192.168.4.1/control?id={id}&magnet=0")
+
+# control(4,200,200)

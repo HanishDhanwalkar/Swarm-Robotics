@@ -3,7 +3,7 @@ from aStar import Map
 from scipy.interpolate import CubicSpline as cs
 from camera import MobileCamera
 from control import *
-cam = MobileCamera("http://192.168.4.3:8080/video")
+cam = MobileCamera("http://192.168.122.86:1111/video")
 
 
 class Box:
@@ -82,10 +82,12 @@ class Bot:
         self.x_prev = self.x
         self.y_prev = self.y
         self.theta_prev = self.theta
-        self.pos_prev = [self.x_prev, self.y_prev]
-        self.speed = self.distFromPoint(self.pos_prev)
-        self.omega = self.theta - self.theta_prev
+        # print("Prev_Theta :",self.theta_prev)
         self.x, self.y, self.theta = self.getPos()
+        # print("Theta :",self.theta)
+        self.pos_prev = [self.x_prev, self.y_prev]
+        self.speed = self.distFromPoint(self.pos_prev)/5.0
+        self.omega = self.theta - self.theta_prev
         self.pos = [self.x, self.y]
         if self.distFromBox(self.box) <= 0.2:
             MagnetOn(self.id)
