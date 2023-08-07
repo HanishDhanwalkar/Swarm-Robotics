@@ -8,9 +8,13 @@ from control import control
 import requests
 from server import StartServer
 
+<<<<<<< HEAD
 print('Start')
 camera = MobileCamera("http://192.168.122.86:1111/video")
 print('Cam Connected.')
+=======
+camera = MobileCamera("http://192.168.0.101:1111/video")
+>>>>>>> 260a68c6b7d300ce5164fa2568fc01e3032f638e
 
 MAP = np.zeros((610, 460))
 MAP_T = np.zeros((610, 460))
@@ -24,16 +28,25 @@ Kp_theta = 0
 Kd_r = 0
 Kd_theta = 0 
 
+<<<<<<< HEAD
 print('Server Started.')
 botIDs = StartServer(1)
+=======
+botIDs = [4,6,8]
+>>>>>>> 260a68c6b7d300ce5164fa2568fc01e3032f638e
 bots = []
 
 for id in botIDs:
     bots.append(Bot(id))
 
+<<<<<<< HEAD
 boxIDs = [5]
 
 dest=[[bots[0].x,bots[0].y]]
+=======
+boxIDs = [5,7,9]
+dest=np.random.randint(30, 80, (4, 2))
+>>>>>>> 260a68c6b7d300ce5164fa2568fc01e3032f638e
 boxs = []
 
 for id in boxIDs:
@@ -41,14 +54,35 @@ for id in boxIDs:
 for i in range(len(boxs)):
     boxs[i].dest=dest[i]
     bots[i].assignBox(boxs[i])
+    
+p=[]
+t=[]
+tb=[]
 
 for i in range(len(bots)):
+    print(i)
     p1, t1, tb1 = bots[i].createPath(MAP, MAP_T)
+    p.append(p1)
+    # print(MAP[list(map(list, p[i].T))[0],list(map(list, p[i].T))[1]])
+    t.append(t1)
+    tb.append(tb1)
+
+    MAP[list(map(list, p[i].T))[0],list(map(list, p[i].T))[1]] = 100
+    #print(MAP_T[p[i]],t[i].shape)
+    MAP_T[list(map(list, p[i].T))[0],list(map(list, p[i].T))[1]] = t[i]
+    MAP_T[p[i][-1][0], p[i][-1][1]] = np.inf
 
 plt.imshow(camera.getEnvironment())
+<<<<<<< HEAD
 plt.plot(p1[:, 0], p1[:, 1])
 plt.xlim(0, 610)
 plt.ylim(0, 460)
+=======
+for i in range(len(bots)):
+    plt.plot(p[i][:, 0], p[i][:, 1])
+plt.xlim(0, 500)
+plt.ylim(0, 500)
+>>>>>>> 260a68c6b7d300ce5164fa2568fc01e3032f638e
 plt.show()
 
 tic = time.time()
