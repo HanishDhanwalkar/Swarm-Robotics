@@ -27,7 +27,6 @@ class MainServer(BaseHTTPRequestHandler):
 def StartServer(numBots):
     server=HTTPServer((Settings['HOST'],Settings['PORT']),MainServer)
     while len(ID)!=numBots:
-        print(ID)
         server.handle_request()
     return ID
 

@@ -4,7 +4,7 @@ import time
 url='http://192.168.4.1/control?'
 
 def control(id,ip,vright,vleft):
-    res=requests.get("http://{id}/control?id={id}&vright={vright}&vleft={vleft}")
+    res=requests.get(f"http://{ip}/control?id={id}&vright={vright}&vleft={vleft}")
     print(res,vleft,vright)
     
 def MagnetOn(id,ip):

@@ -3,16 +3,16 @@ import cv2.aruco as aruco
 import numpy as np
 
 class MobileCamera:
-    def __init__(self, camera):
+    def __init__(self, camera,debug):
         self.camera = camera
         self.cap = cv.VideoCapture(self.camera)
         self.detector = self.CreateDetector()
+        self.debug = debug
 
-    def getImage(self,debug=False):
+    def getImage(self):
         ref, frame = self.cap.read()
-        print(ref)
         frame = cv.resize(frame, (0, 0), fx=0.5, fy=0.5)
-        if debug:
+        if self.debug:
             frame=cv.imread('images/aruco.jpg')
         return frame
 
@@ -76,7 +76,7 @@ class MobileCamera:
 
 
 if __name__ == '__main__':
-    cam = MobileCamera("http://192.168.122.86:1111/video")
+    cam = MobileCamera("http://192.168.122.86:1111/video",True)
     # markers, image = cam.getImage()
     # inp=cv.imread('images/aruc0.png')
     # val,image,markers=detect(inp)
