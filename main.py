@@ -8,4 +8,4 @@ boxes = [5]
 destinations = np.random.randint(30, 80, (4, 2))
 
 newRun = Run(camera, *mapDims, numBots, boxes, destinations, debug=True)
-newRun.run(0, 0, 0, 0)
+newRun.plot3D()

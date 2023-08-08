@@ -115,7 +115,7 @@ class Bot:
 
     def createPath(self, map, mapT):
         path1, t1 = self.path2box(map, mapT)
-        path2, t2 = self.path2target(map, mapT, t1[-1])
+        path2, t2 = self.path2target(map, mapT, t1[-1]+2)
         self.path = np.insert(path2, 0, path1[:-1], axis=0)
         self.t = np.insert(t2, 0, t1[:-1], axis=0)
         self.position = cs(self.t, self.path)

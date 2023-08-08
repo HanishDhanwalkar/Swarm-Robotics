@@ -139,16 +139,18 @@ class Run:
                     marker='.', color='k', zorder=2)
 
         plotBots, plotBoxes, plotDests, plotPaths = [], [], [], []
-        clrs = ['r', 'g', 'b', 'k']
 
         for bot in self.bots:
+            t=np.linspace(0,bot.t[-1],1000)
+            path=bot.position(t)
+            print(path,bot.position(125.8),bot.position(126.8))
             plotBots.append(ax2.scatter([bot.pos[0]], [bot.pos[1]], [0], marker='o',
                                         label=f'Bot {bot.id}', zorder=3))
             plotBoxes.append(ax2.scatter([bot.box.pos[0]], [bot.box.pos[1]], [bot.box.reachtime], marker='d',
                                          label=f'Box {bot.id}', zorder=3))
             plotDests.append(ax2.scatter([bot.target[0]], [bot.target[1]], [bot.t[-1]], marker='*',
                                          label=f'Dest {bot.id}', zorder=3))
-            plotPaths.append(ax2.plot(bot.path[:, 0], bot.path[:, 1], bot.t,
+            plotPaths.append(ax2.plot(path[:, 0], path[:, 1], t,
                              zorder=2))
 
         plt.xlabel('x')
