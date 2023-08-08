@@ -8,10 +8,9 @@ def control(id,ip,vright,vleft):
     print(res,vleft,vright)
     
 def MagnetOn(id,ip):
-    print(f"http://{ip}/control?id={id}&magnet=1")
     requests.get(url,f"http://{ip}/control?id={id}&magnet=1")
 
-def MagnetOff(id):
-    requests.get(url,f"http://192.168.4.1/control?id={id}&magnet=0")
+def MagnetOff(id,ip):
+    requests.get(url,f"http://{ip}/control?id={id}&magnet=0")
 
 # control(4,200,200)

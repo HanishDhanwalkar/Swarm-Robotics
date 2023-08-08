@@ -2,8 +2,8 @@ import numpy as np
 from aStar import Map
 from scipy.interpolate import CubicSpline as cs
 from camera import MobileCamera
-from control import *
-cam = MobileCamera("http://192.168.122.86:1111/video", debug=False)
+import requests
+cam = MobileCamera("http://192.168.122.86:1111/video", debug=True)
 
 
 class Box:
@@ -40,8 +40,9 @@ class Box:
 
 
 class Bot:
-    def __init__(self, id):
+    def __init__(self, id, ip):
         self.id = id
+        self.ip = ip
         self.x, self.y, self.theta = self.getPos()
         self.pos = [self.x, self.y]
         self.x_prev = None
@@ -90,11 +91,11 @@ class Bot:
         self.omega = self.theta - self.theta_prev
         self.pos = [self.x, self.y]
         if self.distFromBox(self.box) <= 0.2:
-            MagnetOn(self.id)
+            self.MagnetOn()
             self.reachedBox = True
 
         if self.distFromPoint(self.target) <= 0.2:
-            MagnetOff(self.id)
+            self.MagnetOff()
 
         if self.reachedBox:
             self.box.x = self.x
@@ -127,7 +128,12 @@ class Bot:
         der = self.dxdy(t).reshape(-1, 2)
         return np.arctan2(der[:, 0], der[:, 1])*180/np.pi
 
-    def returnPos(self, t):
-        pt = self.position(t/10)
-        self.updatePos(pt)
-        return pt
+    def control(self,vright,vleft):
+        res=requests.get(f"http://{self.ip}/control?id={self.id}&vright={vright}&vleft={vleft}")
+        print(res,vleft,vright)
+        
+    def MagnetOn(self):
+        requests.get(f"http://{self.ip}/control?id={self.id}&magnet=1")
+
+    def MagnetOff(self):
+        requests.get(f"http://{self.ip}/control?id={self.id}&magnet=0")
