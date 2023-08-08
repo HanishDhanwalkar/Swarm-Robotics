@@ -2,12 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 from camera import MobileCamera
-from bots import Bot,Box
+from bots import Bot, Box
 from server import StartServer
 
 
 class Run:
-    def __init__(self,camIP, mapW, mapH, numBots, boxIDs, dests, debug) -> None:
+    def __init__(self, camIP, mapW, mapH, numBots, boxIDs, dests, debug) -> None:
         print('Run Started.')
         self.camera = MobileCamera(f"http://{camIP}/video", debug=debug)
         print('Camera Connected.')
@@ -29,7 +29,7 @@ class Run:
         MAP[:, self.mapH-1] = 100
         MAP_T[:, :] = np.inf
         return MAP, MAP_T
-    
+
     def connectBots(self):
         print('Server Started.')
         botIDs = StartServer(self.numBots)
@@ -41,25 +41,25 @@ class Run:
         print('Bots detected')
 
         return bots
-    
-    def connectBoxes(self,ids):
+
+    def connectBoxes(self, ids):
         boxes = []
         for id in ids:
             boxes.append(Box(id))
         print('Boxes detected')
 
         return boxes
-    
+
     def assignTasks(self, dests):
         for i in range(len(self.boxes)):
-            self.boxes[i].dest=dests[i]
+            self.boxes[i].dest = dests[i]
             self.bots[i].assignBox(self.boxes[i])
         print('Task assigned')
 
     def planPath(self):
-        p=[]
-        t=[]
-        tb=[]
+        p = []
+        t = []
+        tb = []
 
         for i in range(len(self.bots)):
             p1, t1, tb1 = self.bots[i].createPath(self.map, self.mapT)
@@ -67,8 +67,10 @@ class Run:
             t.append(t1)
             tb.append(tb1)
 
-            self.map[list(map(list, p[i].T))[0],list(map(list, p[i].T))[1]] = 100
-            self.mapT[list(map(list, p[i].T))[0],list(map(list, p[i].T))[1]] = t[i]
+            self.map[list(map(list, p[i].T))[0],
+                     list(map(list, p[i].T))[1]] = 100
+            self.mapT[list(map(list, p[i].T))[0],
+                      list(map(list, p[i].T))[1]] = t[i]
             self.mapT[p[i][-1][0], p[i][-1][1]] = np.inf
 
         print('Path planned')
@@ -86,7 +88,7 @@ class Run:
                 try:
                     toc = time.time()
                     t = toc - tic
-                    #if int(t%5)==0 and Kd_r<5:
+                    # if int(t%5)==0 and Kd_r<5:
                     #    Kd_r+=0
                     print(f"{Kd_r=},{Kp_r=},{t=}")
                     bot.updatePos()
@@ -95,7 +97,7 @@ class Run:
                     dtheta = bot.orientation(t) - bot.theta
                     # V = Kp_r*dr - Kd_r*bot.speed + 100
                     V = Kp_r*dr - Kd_r*bot.speed
-                    #print(f"V={V}")
+                    # print(f"V={V}")
 
                     # Vleft = int(V + Kp_theta*dtheta + Kd_theta*bot.omega)
                     # Vright = int(V - Kp_theta*dtheta - Kd_theta*bot.omega)
@@ -111,14 +113,14 @@ class Run:
                     if Vright < -255:
                         Vright = -255
                     print(f"Vleft={Vleft}  Vright={Vright}")
-                    bot.control(Vright,Vleft)
+                    bot.control(Vright, Vleft)
                 except Exception as e:
-                    print("ERROR",e, e.args)
-                    bot.control(0,0)
+                    print("ERROR", e, e.args)
+                    bot.control(0, 0)
                     exit(0)
                 except KeyboardInterrupt:
                     print("Keyboard Interrupt")
-                    bot.control(0,0)
+                    bot.control(0, 0)
                     exit(0)
                 time.sleep(0.01)
 
@@ -126,7 +128,7 @@ class Run:
         figure2 = plt.figure(figsize=(6, 6))
         obstacles = np.argwhere(self.map == 100)
 
-        ax2 = figure2.add_subplot(111,projection='3d')
+        ax2 = figure2.add_subplot(111, projection='3d')
         ax2.set_xlim(-1, self.mapW+1)
         ax2.set_ylim(-1, self.mapH+1)
         ax2.scatter(obstacles[:, 0], obstacles[:, 1], [0],
@@ -136,13 +138,13 @@ class Run:
         clrs = ['r', 'g', 'b', 'k']
 
         for bot in self.bots:
-            plotBots.append(ax2.scatter([bot.pos[0]], [bot.pos[1]],[0], marker='o',
-                             label=f'Bot {bot.id}', zorder=3))
-            plotBoxes.append(ax2.scatter([bot.box.pos[0]], [bot.box.pos[1]],[bot.box.reachtime], marker='d',
+            plotBots.append(ax2.scatter([bot.pos[0]], [bot.pos[1]], [0], marker='o',
+                                        label=f'Bot {bot.id}', zorder=3))
+            plotBoxes.append(ax2.scatter([bot.box.pos[0]], [bot.box.pos[1]], [bot.box.reachtime], marker='d',
                                          label=f'Box {bot.id}', zorder=3))
-            plotDests.append(ax2.scatter([bot.target[0]], [bot.target[1]],[bot.t[-1]], marker='*',
+            plotDests.append(ax2.scatter([bot.target[0]], [bot.target[1]], [bot.t[-1]], marker='*',
                                          label=f'Dest {bot.id}', zorder=3))
-            plotPaths.append(ax2.plot(bot.path[:, 0], bot.path[:, 1],bot.t,
+            plotPaths.append(ax2.plot(bot.path[:, 0], bot.path[:, 1], bot.t,
                              zorder=2))
 
         plt.xlabel('x')

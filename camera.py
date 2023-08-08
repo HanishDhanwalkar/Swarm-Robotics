@@ -2,8 +2,9 @@ import cv2 as cv
 import cv2.aruco as aruco
 import numpy as np
 
+
 class MobileCamera:
-    def __init__(self, camera,debug):
+    def __init__(self, camera, debug):
         self.camera = camera
         self.cap = cv.VideoCapture(self.camera)
         self.detector = self.CreateDetector()
@@ -13,7 +14,7 @@ class MobileCamera:
         ref, frame = self.cap.read()
         frame = cv.resize(frame, (0, 0), fx=0.5, fy=0.5)
         if self.debug:
-            frame=cv.imread('images/aruco.jpg')
+            frame = cv.imread('images/aruco.jpg')
         return frame
 
     def CreateDetector(self):
@@ -34,7 +35,7 @@ class MobileCamera:
         order = [0, 1, 2, 3]
         detectedCorners = [0]*4
         markerCorners, markerIds, rejectedCandidates = self.detector(image)
-        markerIds=markerIds.reshape(-1,)
+        markerIds = markerIds.reshape(-1,)
         for i in range(len(markerCorners)):
             try:
                 detectedCorners[order.index(markerIds[i])] = markerCorners[i].mean(axis=1)[0].astype('int32')
@@ -76,14 +77,11 @@ class MobileCamera:
 
 
 if __name__ == '__main__':
-    cam = MobileCamera("http://192.168.122.86:1111/video",True)
-    # markers, image = cam.getImage()
-    # inp=cv.imread('images/aruc0.png')
-    # val,image,markers=detect(inp)
+    cam = MobileCamera("http://192.168.122.86:1111/video", True)
     while True:
-        img=cam.getImage()
+        img = cam.getImage()
         print(cam.getObjects(img))
-        cv.imshow('cam',img)
+        cv.imshow('cam', img)
         if cv.waitKey(25) & 0xFF == ord('q'):
             break
     cv.destroyAllWindows()

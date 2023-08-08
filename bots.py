@@ -7,12 +7,12 @@ cam = MobileCamera("http://192.168.122.86:1111/video", debug=True)
 
 
 class Box:
-    def __init__(self, id: int):   
+    def __init__(self, id: int):
         """
         Constructor
         Args:
             id (int): ID of the box, same as ID of ArUco marker on the box
-        """             
+        """
         self.id = id
         self.x, self.y, self.theta = self.getPos()
         self.pos = [self.x, self.y]
@@ -27,11 +27,11 @@ class Box:
 
         Returns:
             float: _description_
-        """                
+        """
         delX = self.x-point[0]
         delY = self.y-point[1]
         return np.sqrt(delX**2+delY**2)
-    
+
     def getPos(self):
         pos = None
         while not pos:
@@ -83,9 +83,7 @@ class Bot:
         self.x_prev = self.x
         self.y_prev = self.y
         self.theta_prev = self.theta
-        # print("Prev_Theta :",self.theta_prev)
         self.x, self.y, self.theta = self.getPos()
-        # print("Theta :",self.theta)
         self.pos_prev = [self.x_prev, self.y_prev]
         self.speed = self.distFromPoint(self.pos_prev)/5.0
         self.omega = self.theta - self.theta_prev
@@ -128,10 +126,11 @@ class Bot:
         der = self.dxdy(t).reshape(-1, 2)
         return np.arctan2(der[:, 0], der[:, 1])*180/np.pi
 
-    def control(self,vright,vleft):
-        res=requests.get(f"http://{self.ip}/control?id={self.id}&vright={vright}&vleft={vleft}")
-        print(res,vleft,vright)
-        
+    def control(self, vright, vleft):
+        res = requests.get(
+            f"http://{self.ip}/control?id={self.id}&vright={vright}&vleft={vleft}")
+        print(res, vleft, vright)
+
     def MagnetOn(self):
         requests.get(f"http://{self.ip}/control?id={self.id}&magnet=1")
 

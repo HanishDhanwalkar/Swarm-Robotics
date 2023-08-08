@@ -21,11 +21,11 @@ int magnet = 27;
 
 int led = 2; 
 
-const String id="4";
+const String id="4"; // Change for each bot
 
 void connectWiFi(){
   WiFi.begin(ssid, password); 
-  while (WiFi.status() != WL_CONNECTED) { //Check for the connection
+  while (WiFi.status() != WL_CONNECTED) { 
     delay(1000);
     Serial.println("Connecting to WiFi..");
   }
@@ -34,32 +34,28 @@ void connectWiFi(){
 
 void setup() {
   Serial.begin(115200);
-  delay(4000);   //Delay needed before calling the WiFi.begin
+  delay(4000);   
   connectWiFi();
   HTTPClient http; 
-  http.begin("http://192.168.122.118:8080/");  //Specify destination for HTTP request
-   http.addHeader("Content-Type", "text/plain");             //Specify content-type header
+  http.begin("http://192.168.122.118:8080/");  
+   http.addHeader("Content-Type", "text/plain");             
    http.addHeader("id", id);
    http.addHeader("ip", WiFi.localIP().toString().c_str());    
-   int httpResponseCode = http.POST("POSTING from ESP32");   //Send the actual POST request
+   int httpResponseCode = http.POST("POSTING from ESP32");   
    if(httpResponseCode>0){
-    String response = http.getString(); //Get the response to the request
-    Serial.println(httpResponseCode);   //Print return code
-    Serial.println(response);           //Print request answer
+    String response = http.getString(); 
+    Serial.println(httpResponseCode);   
+    Serial.println(response);          
    }else{
     Serial.println(httpResponseCode);
     }
 
-      // Fill in the blanks
     pinMode(LED_BUILTIN, OUTPUT);
     pinMode(enable1_2, OUTPUT);
     pinMode(enable3_4, OUTPUT);
     pinMode(enable_magnet,OUTPUT);
     Serial.begin(115200);
 
-    // The inputs
-    // pinMode(int pinNum, MODE) is the function which sets the functional mode of the corresponding pin
-    // where first argument is the pin number and the second argument is the mode eg. OUTPUT, INPUT.
     pinMode(inp1, OUTPUT);
     pinMode(inp2, OUTPUT);
     pinMode(inp3, OUTPUT);
@@ -69,8 +65,7 @@ void setup() {
 
     pinMode(magnet, OUTPUT);
 
-    // We use the following function to run the bot at variable speed.
-    analogWrite(enable1_2, 255); // analog write "255" corresponds to digital write "1"
+    analogWrite(enable1_2, 255); 
     analogWrite(enable3_4, 255);
     digitalWrite(enable_magnet,HIGH);
     
@@ -79,7 +74,6 @@ void setup() {
         if(request->hasArg("id") & (request->getParam("id")->value()).toInt()==id.toInt()){    
             if(request->hasArg("vright")){ 
                 String vright = request->getParam("vright")->value();
-            // if '255' is the equivalent to digital '1', and '0' is eqvivalent to digial '0', We vary the pwm values to vary the speed of the motor
                 if(vright.toInt()>=0){    
                     digitalWrite(inp1, HIGH);
                     digitalWrite(inp2, LOW);
@@ -91,7 +85,6 @@ void setup() {
                 }
             if(request->hasArg("vleft")){ 
                 String vleft = request->getParam("vleft")->value();
-            // if '255' is the equivalent to digital '1', and '0' is eqvivalent to digial '0', We vary the pwm values to vary the speed of the motor
                 if(vleft.toInt()>=0){    
                     digitalWrite(inp3, HIGH);
                     digitalWrite(inp4, LOW);
@@ -115,5 +108,4 @@ void setup() {
 }
   
 void loop() {
-  // Serial.println("Connected");
 }
