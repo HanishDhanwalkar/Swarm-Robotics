@@ -1,9 +1,7 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
-from control import control,MagnetOn,MagnetOff
 
 Settings = {"HOST": "192.168.122.118", "PORT": 8080}
-
 
 ID = {}
 class MainServer(BaseHTTPRequestHandler):
@@ -29,5 +27,3 @@ def StartServer(numBots):
     while len(ID)!=numBots:
         server.handle_request()
     return ID
-
-# print(StartServer())
