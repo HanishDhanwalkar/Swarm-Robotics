@@ -32,7 +32,7 @@ class Run:
     
     def connectBots(self):
         print('Server Started.')
-        botIDs = {4:'192.168.122.164:8080'} #StartServer(self.numBots)
+        botIDs = StartServer(self.numBots)
         print('Bots Connected.')
 
         bots = []
