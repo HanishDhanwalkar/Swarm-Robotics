@@ -143,7 +143,6 @@ class Run:
         for bot in self.bots:
             t=np.linspace(0,bot.t[-1],1000)
             path=bot.position(t)
-            print(path,bot.position(125.8),bot.position(126.8))
             plotBots.append(ax2.scatter([bot.pos[0]], [bot.pos[1]], [0], marker='o',
                                         label=f'Bot {bot.id}', zorder=3))
             plotBoxes.append(ax2.scatter([bot.box.pos[0]], [bot.box.pos[1]], [bot.box.reachtime], marker='d',

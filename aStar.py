@@ -48,6 +48,7 @@ class Map:
         self.init.t = tStart
         self.mapT = mapT
         self.init.fscore = self.init.getFscore(self.fin)
+        self.speed = 6
 
     def Dist(self, p1, p2):
         deltaX = p1[0]-p2[0]
@@ -55,7 +56,7 @@ class Map:
         return np.sqrt(deltaX**2+deltaY**2)
 
     def isCollision(self, p, point: Node):
-        t = point.t+self.Dist(p, np.array([3, 3]))/3
+        t = point.t+self.Dist(p, np.array([3, 3]))/self.speed
         if self.mapT[p[0]+point.x-3, p[1]+point.y-3] == np.inf or abs(self.mapT[p[0]+point.x-3, p[1]+point.y-3]-t) < 0.5:
             return self.Dist(p, np.array([3, 3]))
         return np.inf
@@ -69,7 +70,7 @@ class Map:
         return 25/self.Dist(closest, np.array([3, 3]))
 
     def updatedGScore(self, init: Node, new: Node):
-        t = init.t+init.Dist(new)/3
+        t = init.t+init.Dist(new)/self.speed
         if self.map[new.x, new.y] == 100 and (self.mapT[new.x, new.y] == np.inf or abs(self.mapT[new.x, new.y]-t) < 0.5):
             return np.inf
         return init.gscore+self.neighbourOfObstacle(new)+1
@@ -107,7 +108,7 @@ class Map:
                 if newGScore < neighbour.gscore:
                     neighbour.parent = curr
                     neighbour.gscore = newGScore
-                    neighbour.t = curr.t+neighbour.Dist(curr)/3
+                    neighbour.t = curr.t+neighbour.Dist(curr)/self.speed
                     neighbour.fscore = neighbour.getFscore(self.fin)
                     if neighbour not in self.openSet:
                         self.openSet.append(neighbour)
