@@ -10,6 +10,7 @@ class Run:
     def __init__(self, camIP, mapW, mapH, numBots, boxIDs, dests, debug) -> None:
         print('Run Started.')
         self.camera = MobileCamera(f"http://{camIP}/video", debug=debug)
+        self.debug = debug
         print('Camera Connected.')
         self.mapW = mapW
         self.mapH = mapH
@@ -32,7 +33,10 @@ class Run:
 
     def connectBots(self):
         print('Server Started.')
-        botIDs = StartServer(self.numBots)
+        if self.debug:
+            botIDs = {4 : '192.168.122.164:8080'}
+        else:
+            botIDs = StartServer(self.numBots)
         print('Bots Connected.')
 
         bots = []
