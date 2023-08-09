@@ -34,7 +34,7 @@ class Run:
     def connectBots(self):
         print('Server Started.')
         if self.debug:
-            botIDs = {4 : '192.168.122.164:8080'}
+            botIDs = {4 : '192.168.122.164:8080',5 : '192.168.122.164:8080'}
         else:
             botIDs = StartServer(self.numBots)
         print('Bots Connected.')
@@ -64,7 +64,6 @@ class Run:
         p = []
         t = []
         tb = []
-
         for i in range(len(self.bots)):
             p1, t1, tb1 = self.bots[i].createPath(self.map, self.mapT)
             p.append(p1)
@@ -80,7 +79,8 @@ class Run:
         print('Path planned')
 
         plt.imshow(self.camera.getEnvironment())
-        plt.plot(p1[:, 0], p1[:, 1])
+        for path in p:
+            plt.plot(path[:, 0], path[:, 1])
         plt.xlim(0, self.mapW)
         plt.ylim(0, self.mapH)
         plt.show()
