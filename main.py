@@ -1,7 +1,7 @@
 from Runner import Run
 import numpy as np
 
-camera = '192.168.122.86:1111'
+camera = '192.168.0.190:1111'
 mapDims = [610, 460]
 numBots = 1
 boxes = [4]

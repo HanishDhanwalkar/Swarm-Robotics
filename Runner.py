@@ -64,7 +64,6 @@ class Run:
         p = []
         t = []
         tb = []
-
         for i in range(len(self.bots)):
             p1, t1, tb1 = self.bots[i].createPath(self.map, self.mapT)
             p.append(p1)
