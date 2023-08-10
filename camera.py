@@ -1,7 +1,7 @@
 import cv2 as cv
 import cv2.aruco as aruco
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 class MobileCamera:
     def __init__(self, camera, debug):
@@ -24,11 +24,11 @@ class MobileCamera:
         return detector.detectMarkers
 
     def getOrientation(self, marker):
-        c1, c2, c3, c4 = marker[0]
+        c1,c2,c3,c4= marker[0]
         point1 = (c1+c2)/2
-        point2 = (c3+c4)/2
-        dif = point2-point1
-        orient = np.degrees(np.arctan2(dif[1], dif[0]))
+        point2 = (c4+c3)/2
+        dif = point1-point2
+        orient = -np.degrees(np.arctan2(dif[1], dif[0]))
         return orient
 
     def getCorners(self, image):
@@ -65,6 +65,7 @@ class MobileCamera:
             center = markerCorners[i].mean(axis=1)[0].astype('int32')
             theta = self.getOrientation(markerCorners[i])
             markers[markerIds[i][0]] = (center[0], center[1], theta)
+            plt.imshow(image)
         return markers
 
     def getPosOfID(self, id):
@@ -77,11 +78,10 @@ class MobileCamera:
 
 
 if __name__ == '__main__':
-    cam = MobileCamera("http://192.168.122.86:1111/video", True)
-    while True:
-        img = cam.getImage()
+    cam = MobileCamera("http://192.168.122.86:1111/video", False)
+    for _ in range(5):
+        img = cam.getEnvironment().astype(np.uint8)
         print(cam.getObjects(img))
-        cv.imshow('cam', img)
-        if cv.waitKey(25) & 0xFF == ord('q'):
-            break
+        plt.imshow( img)
+        plt.show()
     cv.destroyAllWindows()

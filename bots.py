@@ -3,7 +3,7 @@ from aStar import Map
 from scipy.interpolate import CubicSpline as cs
 from camera import MobileCamera
 import requests
-cam = MobileCamera("http://192.168.122.86:1111/video", debug=True)
+cam = MobileCamera("http://192.168.122.86:1111/video", debug=False)
 
 
 class Box:

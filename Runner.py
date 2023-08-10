@@ -34,7 +34,7 @@ class Run:
     def connectBots(self):
         print('Server Started.')
         if self.debug:
-            botIDs = {4 : '192.168.122.164:8080'}
+            botIDs = {4 : '192.168.122.164:8080',5 : '192.168.122.164:8080',6 : '192.168.122.164:8080'}
         else:
             botIDs = StartServer(self.numBots)
         print('Bots Connected.')
@@ -80,7 +80,8 @@ class Run:
         print('Path planned')
 
         plt.imshow(self.camera.getEnvironment())
-        plt.plot(p1[:, 0], p1[:, 1])
+        for path in p:
+            plt.plot(path[:, 0], path[:, 1])
         plt.xlim(0, self.mapW)
         plt.ylim(0, self.mapH)
         plt.show()
@@ -92,22 +93,24 @@ class Run:
                 try:
                     toc = time.time()
                     t = toc - tic
-                    # if int(t%5)==0 and Kd_r<5:
-                    #    Kd_r+=0
+                    # if int(t%10)==0:
+                    #    Kd_theta+=1
                     print(f"{Kd_r=},{Kp_r=},{t=}")
                     bot.updatePos()
                     exp_pos = bot.position(t)
                     dr = bot.distFromPoint(exp_pos)/5.0
                     dtheta = bot.orientation(t) - bot.theta
-                    # V = Kp_r*dr - Kd_r*bot.speed + 100
-                    V = Kp_r*dr - Kd_r*bot.speed
-                    # print(f"V={V}")
+                    print([dtheta, bot.theta,bot.orientation(t)])
+                    
+                    V = Kp_r*dr - Kd_r*bot.speed + 75
+                    # V = Kp_r*dr - Kd_r*bot.speed
+                    print(f"V={V}   dr={dr} ")
+                    if abs(dtheta) <= 10:
+                        dtheta=0
 
-                    # Vleft = int(V + Kp_theta*dtheta + Kd_theta*bot.omega)
-                    # Vright = int(V - Kp_theta*dtheta - Kd_theta*bot.omega)
-                    # print(f"{dtheta=}, {bot.theta=}, {bot.omega=}")
-                    Vleft = int(200)
-                    Vright = int(-200)
+                    Vright = int(V - Kp_theta*dtheta - Kd_theta*bot.omega)
+                    Vleft = int(V + Kp_theta*dtheta + Kd_theta*bot.omega)
+    
                     if Vleft > 255:
                         Vleft = 255
                     if Vleft < -255:
@@ -117,7 +120,7 @@ class Run:
                     if Vright < -255:
                         Vright = -255
                     print(f"Vleft={Vleft}  Vright={Vright}")
-                    bot.control(Vright, Vleft)
+                    bot.control(Vright,Vleft)
                 except Exception as e:
                     print("ERROR", e, e.args)
                     bot.control(0, 0)
@@ -126,7 +129,7 @@ class Run:
                     print("Keyboard Interrupt")
                     bot.control(0, 0)
                     exit(0)
-                time.sleep(0.01)
+                time.sleep(0.001)
 
     def plot3D(self):
         figure2 = plt.figure(figsize=(6, 6))
