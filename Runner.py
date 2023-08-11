@@ -34,7 +34,7 @@ class Run:
     def connectBots(self):
         print('Server Started.')
         if self.debug:
-            botIDs = {4 : '192.168.122.164:8080',5 : '192.168.122.164:8080',6 : '192.168.122.164:8080'}
+            botIDs = {4 : '192.168.122.164:1111',5 : '192.168.122.164:1111',6 : '192.168.122.164:1111'}
         else:
             botIDs = StartServer(self.numBots)
         print('Bots Connected.')
@@ -85,8 +85,28 @@ class Run:
         plt.ylim(0, self.mapH)
         plt.show()
 
+    def plotControls(self,t,dtheta,vl=[],vr=[],dr=[]):
+        fig3 = plt.figure(figsize=(10,6))
+        ax=fig3.add_subplot(1,1,1)
+        ax.plot(t,dtheta,label='dtheta')
+        if len(vr)>0:
+            ax.plot(t,vr,label='vr')
+        if len(vl)>0:
+            ax.plot(t,vl,label='vl')
+        if len(dr)>0:
+            ax.plot(t,dr,label='dr')
+        plt.legend()
+        plt.show()
+
     def run(self, Kp_r, Kp_theta, Kd_r, Kd_theta):
         tic = time.time()
+        vr=[]
+        vl=[]
+        dt=[]
+        Dr=[]
+        T=[]
+        vinL=125
+        vinR=125
         while True:
             for bot in self.bots:
                 try:
@@ -98,12 +118,14 @@ class Run:
                     bot.updatePos()
                     exp_pos = bot.position(t)
                     dr = bot.distFromPoint(exp_pos)/5.0
-                    dtheta = bot.orientation(t) - bot.theta
-                    print([dtheta, bot.theta,bot.orientation(t)])
+                    # dtheta = bot.orientation(t) - bot.theta
+                    dtheta=90-bot.theta
+                    print(f"{dtheta=}, {bot.theta=}")
                     
-                    V = Kp_r*dr - Kd_r*bot.speed + 75
-                    # V = Kp_r*dr - Kd_r*bot.speed
-                    print(f"V={V}   dr={dr} ")
+                    V = Kp_r*dr - Kd_r*bot.speed 
+                    Dr.append(dr)
+                    T.append(t)
+                    dt.append(dtheta)
                     if abs(dtheta) <= 10:
                         dtheta=0
 
@@ -118,17 +140,27 @@ class Run:
                         Vright = 255
                     if Vright < -255:
                         Vright = -255
+
+                    Vright=np.sign(Vright)*(abs(Vright)*145/255+110)
+                    Vleft=np.sign(Vleft)*(abs(Vleft)*145/255+110)
+
+                    vr.append(Vright)
+                    vl.append(Vleft)
                     print(f"Vleft={Vleft}  Vright={Vright}")
                     bot.control(Vright,Vleft)
                 except Exception as e:
                     print("ERROR", e, e.args)
                     bot.control(0, 0)
+                    self.plotControls(T,dt)
                     exit(0)
                 except KeyboardInterrupt:
                     print("Keyboard Interrupt")
                     bot.control(0, 0)
+                    self.plotControls(T,dt)
                     exit(0)
-                time.sleep(0.001)
+                # time.sleep(0.05)
+                # bot.control(0, 0)
+        self.plotControls(T,dt)
 
     def plot3D(self):
         figure2 = plt.figure(figsize=(6, 6))

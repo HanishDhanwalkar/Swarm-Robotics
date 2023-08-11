@@ -30,3 +30,5 @@ def StartServer(numBots):
     while len(ID) != numBots:
         server.handle_request()
     return ID
+
+print(StartServer(1))

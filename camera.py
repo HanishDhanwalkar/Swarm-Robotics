@@ -28,7 +28,7 @@ class MobileCamera:
         point1 = (c1+c2)/2
         point2 = (c4+c3)/2
         dif = point1-point2
-        orient = -np.degrees(np.arctan2(dif[1], dif[0]))
+        orient = np.degrees(np.arctan2(dif[1], dif[0]))
         return orient
 
     def getCorners(self, image):
@@ -78,10 +78,11 @@ class MobileCamera:
 
 
 if __name__ == '__main__':
-    cam = MobileCamera("http://192.168.122.86:1111/video", False)
-    for _ in range(5):
+    cam = MobileCamera("http://192.168.122.1:8080/video", False)
+    while True:
         img = cam.getEnvironment().astype(np.uint8)
         print(cam.getObjects(img))
-        plt.imshow( img)
-        plt.show()
+        cv.imshow('cam', img)
+        if cv.waitKey(10) & 0xFF == ord('q'):
+            break
     cv.destroyAllWindows()
